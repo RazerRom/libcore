@@ -59,12 +59,21 @@ public final class Daemons {
      */
     private static abstract class Daemon implements Runnable {
         private Thread thread;
+        private String name;
+
+        public Daemon(String name) {
+            this.name = name;
+        }
+
+        public Daemon() {
+            this.name = getClass().getSimpleName();
+        }
 
         public synchronized void start() {
             if (thread != null) {
                 throw new IllegalStateException("already running");
             }
-            thread = new Thread(ThreadGroup.systemThreadGroup, this, getClass().getSimpleName());
+            thread = new Thread(ThreadGroup.systemThreadGroup, this, name);
             thread.setDaemon(true);
             thread.start();
         }
@@ -129,6 +138,10 @@ public final class Daemons {
     private static class ReferenceQueueDaemon extends Daemon {
         private static final ReferenceQueueDaemon INSTANCE = new ReferenceQueueDaemon();
 
+        ReferenceQueueDaemon() {
+            super("ReferenceQueueDaemon");
+        }
+
         @Override public void run() {
             while (isRunning()) {
                 Reference<?> list;
@@ -171,6 +184,10 @@ public final class Daemons {
         private volatile Object finalizingObject;
         private volatile long finalizingStartedNanos;
 
+        FinalizerDaemon() {
+            super("FinalizerDaemon");
+        }
+
         @Override public void run() {
             while (isRunning()) {
                 // Take a reference, blocking until one is ready or the thread should stop
@@ -210,6 +227,10 @@ public final class Daemons {
      */
     private static class FinalizerWatchdogDaemon extends Daemon {
         private static final FinalizerWatchdogDaemon INSTANCE = new FinalizerWatchdogDaemon();
+
+        FinalizerWatchdogDaemon() {
+            super("FinalizerWatchdogDaemon");
+        }
 
         @Override public void run() {
             while (isRunning()) {
@@ -308,6 +329,10 @@ public final class Daemons {
     private static class HeapTrimmerDaemon extends Daemon {
         private static final HeapTrimmerDaemon INSTANCE = new HeapTrimmerDaemon();
 
+        HeapTrimmerDaemon() {
+            super("HeapTrimmerDaemon");
+        }
+
         @Override public void run() {
             while (isRunning()) {
                 try {
@@ -323,6 +348,10 @@ public final class Daemons {
 
     private static class GCDaemon extends Daemon {
         private static final GCDaemon INSTANCE = new GCDaemon();
+
+        GCDaemon() {
+            super("HeapTaskDaemon");
+        }
 
         // Overrides the Daemon.interupt method which is called from Daemons.stop.
         public void interrupt(Thread thread) {
