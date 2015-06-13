@@ -128,6 +128,7 @@ public abstract class UriCodec {
     }
 
     public final String encode(String s, Charset charset) {
+        if (s == null) return "";
         // Guess a bit larger for encoded form
         StringBuilder builder = new StringBuilder(s.length() + 16);
         appendEncoded(builder, s, charset, false);
