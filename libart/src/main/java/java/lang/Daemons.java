@@ -350,7 +350,7 @@ public final class Daemons {
         private static final GCDaemon INSTANCE = new GCDaemon();
 
         GCDaemon() {
-            super("HeapTaskDaemon");
+            super("GCDaemon");
         }
 
         // Overrides the Daemon.interupt method which is called from Daemons.stop.
